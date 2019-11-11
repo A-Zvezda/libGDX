@@ -9,6 +9,8 @@ import ru.geekbrains.base.Sprite;
 public class Logo extends Sprite {
 
     private final Vector2 v0 = new Vector2(0.5f, 0.0f);
+    private Vector2 v1 = new Vector2();
+
     private final Vector2 velocity = new Vector2();
     private Vector2 destPoint = new  Vector2();
     private boolean pressedLeft;
@@ -16,9 +18,7 @@ public class Logo extends Sprite {
     private boolean pressedUp;
     private boolean pressedDown;
 
-    private static final int INVALID_POINTER = -1;
-    private int leftPointer = INVALID_POINTER;
-    private int rightPointer = INVALID_POINTER;
+    private final float V_LEN = 0.005f;
     private Rect worldBounds;
 
     public Logo(TextureRegion region, Rect worldBounds) {
@@ -27,22 +27,9 @@ public class Logo extends Sprite {
     }
     @Override
     public void update(float deltaTime) {
-        pos.mulAdd(velocity, deltaTime);
-
-        if (getRight() > worldBounds.getRight()) {
-            setRight(worldBounds.getRight());
-            stop();
-        }
-        if (getLeft() < worldBounds.getLeft()) {
-            setLeft(worldBounds.getLeft());
-            stop();
-        }
-        if (getTop() < worldBounds.getTop()) {
-            setTop(worldBounds.getTop());
-            stop();
-        }
-        if (getBottom() < worldBounds.getBottom()) {
-            setBottom(worldBounds.getBottom());
+        if (destPoint.sub(pos).len() > V_LEN) {
+            pos.add(v1);
+        } else {
             stop();
         }
     }
@@ -120,16 +107,9 @@ public class Logo extends Sprite {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
-        destPoint =pos.cpy().sub(touch).nor() ;
-        if(touch.x < worldBounds.pos.x) {
-            if(leftPointer != INVALID_POINTER) return false;
-            leftPointer = pointer;
-            moveLeft();
-        } else {
-            if(rightPointer != INVALID_POINTER) return false;
-            rightPointer = pointer;
-            moveRight();
-        }
+        v1 = touch.cpy().sub(pos).setLength(V_LEN);
+        destPoint = touch.cpy();
+        System.out.println(v1);
         return false;
     }
     private void moveRight() {
