@@ -8,7 +8,7 @@ import ru.geekbrains.base.Sprite;
 
 public class Logo extends Sprite {
 
-    private final Vector2 v0 = new Vector2(0.5f, 0.0f);
+    private final Vector2 v0 = new Vector2(0.005f, 0.0f);
     private Vector2 v1 = new Vector2();
 
     private final Vector2 velocity = new Vector2();
@@ -19,19 +19,23 @@ public class Logo extends Sprite {
     private boolean pressedDown;
 
     private final float V_LEN = 0.005f;
-    private Rect worldBounds;
 
-    public Logo(TextureRegion region, Rect worldBounds) {
+
+    public Logo(TextureRegion region) {
         super(region);
-        this.worldBounds = worldBounds;
+
     }
     @Override
     public void update(float deltaTime) {
-        if (destPoint.sub(pos).len() > V_LEN) {
-            pos.add(v1);
+        if (destPoint.sub(pos).len() > V_LEN ) {
+            pos.add(velocity);
+        } else if  (pressedLeft || pressedRight || pressedUp ||pressedDown ) {
+            pos.add(velocity);
         } else {
+            pos.set(destPoint);
             stop();
         }
+
     }
 
 
@@ -107,9 +111,10 @@ public class Logo extends Sprite {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
-        v1 = touch.cpy().sub(pos).setLength(V_LEN);
+        velocity.set (touch.cpy().sub(pos).setLength(V_LEN));
         destPoint = touch.cpy();
-        System.out.println(v1);
+        System.out.println(destPoint);
+        System.out.println(velocity);
         return false;
     }
     private void moveRight() {
@@ -129,7 +134,4 @@ public class Logo extends Sprite {
         velocity.setZero();
     }
 
-    public Vector2 getVelocity() {
-        return velocity;
-    }
 }

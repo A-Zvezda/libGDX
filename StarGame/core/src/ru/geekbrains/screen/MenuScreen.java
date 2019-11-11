@@ -24,7 +24,7 @@ public class MenuScreen extends BaseScreen {
         super.show();
         img = new Texture("badlogic.jpg");
         bg = new Texture("textures/bg.png");
-        logo = new Logo(new TextureRegion(img), worldBounds);
+        logo = new Logo(new TextureRegion(img));
         logo.setHeightProportion(0.5f);
         background = new Background(new TextureRegion(bg));
     }
