@@ -20,7 +20,9 @@ public class Sprite extends Rect {
         regions = new TextureRegion[1];
         regions[0] = region;
     }
-
+    public Sprite(TextureRegion region, int rows, int cols, int frames) {
+        this.regions = split(region, rows, cols, frames);
+    }
     public void draw(SpriteBatch batch) {
         batch.draw(
                 regions[frame],
@@ -69,4 +71,22 @@ public class Sprite extends Rect {
     public void setScale(float scale) {
         this.scale = scale;
     }
+
+    public TextureRegion[] split(TextureRegion region, int rows, int cols, int frames) {
+
+        TextureRegion[] regions = new TextureRegion[frames];
+        int tileWidth = region.getRegionWidth() / cols;
+        int tileHeight = region.getRegionHeight() / rows;
+
+        int frame = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                regions[frame] = new TextureRegion(region, tileWidth * j, tileHeight * i, tileWidth, tileHeight);
+                if(frame == frames - 1) return regions;
+                frame++;
+            }
+        }
+        return regions;
+    }
+
 }
