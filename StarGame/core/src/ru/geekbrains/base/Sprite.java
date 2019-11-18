@@ -95,3 +95,4 @@ public class Sprite extends Rect {
         return destroyed;
     }
 }
+
