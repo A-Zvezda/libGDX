@@ -1,3 +1,4 @@
+
 package ru.geekbrains.math;
 
 import java.util.Random;
@@ -18,3 +19,4 @@ public class Rnd {
         return random.nextFloat() * (max - min) + min;
     }
 }
+

@@ -1,27 +1,31 @@
 package ru.geekbrains.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.math.Rect;
+import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.sprite.Background;
-import ru.geekbrains.sprite.Ship;
+import ru.geekbrains.sprite.MainShip;
 import ru.geekbrains.sprite.Star;
 
 public class GameScreen extends BaseScreen {
 
-    private static final int STAR_COUNT = 50;
+    private static final int STAR_COUNT = 64;
 
     private Texture bg;
     private TextureAtlas atlas;
-    private Star[] stars;
-    private Ship ship;
+
     private Background background;
+    private Star[] stars;
+    private MainShip mainShip;
+    private Music music;
+    private BulletPool bulletPool;
 
     @Override
     public void show() {
@@ -30,61 +34,75 @@ public class GameScreen extends BaseScreen {
         background = new Background(new TextureRegion(bg));
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
         stars = new Star[STAR_COUNT];
-        ship = new Ship(atlas);
         for (int i = 0; i < STAR_COUNT; i++) {
             stars[i] = new Star(atlas);
         }
+        bulletPool = new BulletPool();
+        mainShip = new MainShip(atlas, bulletPool);
+        this.music = Gdx.audio.newMusic(Gdx.files.internal("sounds/music.mp3"));
+        this.music.setLooping(true);
+        this.music.play();
+
     }
 
     @Override
     public void render(float delta) {
-        super.render(delta);
         update(delta);
+        freeAllDestroyed();
         draw();
     }
 
     @Override
     public void resize(Rect worldBounds) {
-        super.resize(worldBounds);
         background.resize(worldBounds);
-        ship.resize(worldBounds);
-        for (Star star:stars) {
+        for (Star star : stars) {
             star.resize(worldBounds);
         }
+        mainShip.resize(worldBounds);
     }
 
     @Override
     public void dispose() {
         bg.dispose();
+        music.dispose();
         atlas.dispose();
         super.dispose();
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        return super.keyDown(keycode);
+        mainShip.keyDown(keycode);
+        return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        return super.keyUp(keycode);
+        mainShip.keyUp(keycode);
+        return false;
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
-        return super.touchDown(touch, pointer);
+        mainShip.touchDown(touch, pointer);
+        return false;
     }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer) {
-        return super.touchUp(touch, pointer);
+        mainShip.touchUp(touch, pointer);
+        return false;
     }
 
     private void update(float delta) {
-        ship.update(delta);
         for (Star star : stars) {
             star.update(delta);
         }
+        mainShip.update(delta);
+        bulletPool.updateActiveSprites(delta);
+    }
+
+    private void freeAllDestroyed() {
+        bulletPool.freeAllDestroyedActiveSprites();
     }
 
     private void draw() {
@@ -92,10 +110,11 @@ public class GameScreen extends BaseScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.draw(batch);
-        ship.draw(batch);
-        for (Star star:stars) {
+        for (Star star : stars) {
             star.draw(batch);
         }
+        mainShip.draw(batch);
+        bulletPool.drawActiveSprites(batch);
         batch.end();
     }
 }
