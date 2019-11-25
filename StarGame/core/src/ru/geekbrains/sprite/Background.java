@@ -1,4 +1,3 @@
-
 package ru.geekbrains.sprite;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,4 +19,3 @@ public class Background extends Sprite {
         this.pos.set(worldBounds.pos);
     }
 }
-

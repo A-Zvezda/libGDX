@@ -1,4 +1,3 @@
-
 package ru.geekbrains.base;
 
 import com.badlogic.gdx.Gdx;

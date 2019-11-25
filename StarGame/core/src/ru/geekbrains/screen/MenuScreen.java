@@ -105,4 +105,3 @@ public class MenuScreen extends BaseScreen {
         batch.end();
     }
 }
-
