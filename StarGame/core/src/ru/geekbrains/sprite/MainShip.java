@@ -8,11 +8,13 @@ import com.badlogic.gdx.math.Vector2;
 import ru.geekbrains.base.Ship;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
+import ru.geekbrains.pool.ExplosionPool;
 
 public class MainShip extends Ship {
 
     private static final float BOTTOM_MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
+    private static final int HP = 10;
 
     private boolean pressedLeft;
     private boolean pressedRight;
@@ -20,17 +22,28 @@ public class MainShip extends Ship {
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         bulletRegion = atlas.findRegion("bulletMainShip");
         sound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         v0.set(0.5f, 0);
         reloadInterval = 0.2f;
         bulletHeight = 0.01f;
         damage = 1;
-        hp = 100;
+        hp = HP;
         bulletV.set(0, 0.5f);
+    }
+
+    public void startNewGame(Rect worldBounds) {
+        pressedLeft = false;
+        pressedRight = false;
+        leftPointer = INVALID_POINTER;
+        rightPointer = INVALID_POINTER;
+        stop();
+        hp = HP;
+        pos.x = worldBounds.pos.x;
     }
 
     @Override
@@ -40,7 +53,6 @@ public class MainShip extends Ship {
         setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
     }
 
-    @Override
     public void update(float delta) {
         super.update(delta);
         if (getRight() > worldBounds.getRight()) {
@@ -126,6 +138,15 @@ public class MainShip extends Ship {
             }
         }
         return false;
+    }
+
+    public boolean isBulletCollision(Rect bullet) {
+        return !(
+                bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getTop() < getBottom()
+                || bullet.getBottom() > pos.y
+        );
     }
 
     public void dispose() {
